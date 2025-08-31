@@ -7,5 +7,6 @@ I am trying to move away from NixOS, and currently in the process of doing so. T
 
 * TODO
 - [X] Move all config files into stow-home
-- [ ] Move to Cosmic DE when that releases
+- [ ] Writeup of all dependencies and packages
 - [ ] Add font and theme to personal void-packages repo (look into distancing from Nix)
+- [ ] Move to Cosmic DE when that releases

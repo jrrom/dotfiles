@@ -1,0 +1,6 @@
+font=Maple Mono 12
+background-color=#282828CC
+text-color=#FBF1C7FF
+progress-color=over #FE8019FF
+default-timeout=5000
+ignore-timeout=1

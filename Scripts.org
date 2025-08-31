@@ -4,9 +4,11 @@
 ** GNU Stow
 A simple command to restow GNU Stow with the directory stow-root.
 
-#+begin_src sh
+#+begin_src shell
 stow stow-home
+echo "Success"
 #+end_src
 
 #+RESULTS:
+: Success
 

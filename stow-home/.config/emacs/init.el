@@ -1,5 +1,7 @@
 (defun jrrom/org-babel-tangle-config ()
-  (when (string-equal (buffer-file-name)  (expand-file-name "~/dotfiles/Emacs.org"))
+  (when (or (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Emacs.org"))
+			(string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Programs.org")))
+    (org-element-cache-reset)
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
@@ -357,6 +359,23 @@
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
+(use-package org-contrib
+  :ensure t
+  :defer t
+  :after org)
+
+(use-package org-babel
+  :no-require
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+	 (emacs-lisp . t)
+	 (shell . t))))
+
+(use-package fish-mode
+  :ensure t)
+
 (use-package dired
   :custom
   (dired-dwim-target t)
@@ -429,6 +448,7 @@
 (use-package vterm
   :ensure t
   :config
+  (setq vterm-shell "fish")
   (global-set-key (kbd "C-x 5 t") 'vterm-other-frame))
 
 (defun vterm-other-frame ()

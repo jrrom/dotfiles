@@ -1,0 +1,12 @@
+#+TITLE: All My Important Scripts
+
+* User-Related
+** GNU Stow
+A simple command to restow GNU Stow with the directory stow-root.
+
+#+begin_src sh
+stow stow-root
+#+end_src
+
+#+RESULTS:
+

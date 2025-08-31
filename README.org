@@ -4,3 +4,9 @@
 Hello, I'm [[www.github.com/jrrom][jrrom]]. This is my literate configuration for my daily use. I use [[https://www.gnu.org/software/stow/][GNU Stow]] for keeping track of my dotfiles. I used to use [[https://github.com/nix-community/home-manager][home-manager]] but I dislike the Nix interface and prefer doing it "directly." If you see anything you like then feel free to copy!
 
 I am trying to move away from NixOS, and currently in the process of doing so. This is very much still a work in progress.
+
+* TODO
+- [ ] Move all config files into stow-home
+- [ ] Look into ways of removing nix
+- [ ] Switch font and theme and make it reproducible
+- [ ] Look into cleaning up grub and switching display manager away from tuigreet

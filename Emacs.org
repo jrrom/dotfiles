@@ -1,5 +1,5 @@
 #+TITLE:jrrom's Emacs Configuration
-#+PROPERTY: header-args:emacs-lisp :tangle ./stow-root/.config/emacs/init.el
+#+PROPERTY: header-args:emacs-lisp :tangle ./stow-home/.config/emacs/init.el
 
 *  Miscellaneous
 ** Auto Tangle

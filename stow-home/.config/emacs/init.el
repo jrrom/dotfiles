@@ -136,7 +136,7 @@
   (savehist-mode 1)                         ;; Save history
   (recentf-mode 1)                          ;; Keep track of recent files!
   (auto-revert-mode 1)                      ;; Keeps your Emacs buffers in sync with external changes
-  (indent-tabs-mode nil)                     ;; Disable the use of tabs for indentation (use spaces instead).
+  (setq-default indent-tabs-mode nil)                    ;; Disable the use of tabs for indentation (use spaces instead).
   (prefer-coding-system 'utf-8)             ;; Only UTF8 here
   (setq-default cursor-type 'box))
 
@@ -163,7 +163,9 @@
 
 (use-package org
   :defer t
-  :hook (org-mode . (lambda () (org-content 2)))
+  :hook (org-mode . (lambda ()
+                      (when (org-before-first-heading-p)
+                        (org-content 2))))
   :custom
   (org-src-tab-acts-natively t)
   (org-src-fontify-natively  t)
@@ -398,7 +400,7 @@
         ("\\.mov\\'" "mpv %s &")
         ("\\.flv\\'" "mpv %s &")
         ("\\.mpg\\'" "mpv %s &")
-        ("\\.pdf\\'" "zathura %s &")
+        ("\\.pdf\\'" "firefox %s &")
         ("\\.mp3\\'" "mpv %s &")
         ("\\.flac\\'" "mpv %s &")
         ("\\.ogg\\'" "mpv %s &")

@@ -6,7 +6,6 @@ Hello, I'm [[www.github.com/jrrom][jrrom]]. This is my literate configuration fo
 I am trying to move away from NixOS, and currently in the process of doing so. This is very much still a work in progress.
 
 * TODO
-- [ ] Move all config files into stow-home
-- [ ] Look into ways of removing nix
-- [ ] Switch font and theme and make it reproducible
-- [ ] Look into cleaning up grub and switching display manager away from tuigreet
+- [X] Move all config files into stow-home
+- [ ] Move to Cosmic DE when that releases
+- [ ] Add font and theme to personal void-packages repo (look into distancing from Nix)

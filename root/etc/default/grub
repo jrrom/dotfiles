@@ -19,4 +19,4 @@ GRUB_CMDLINE_LINUX_DEFAULT="loglevel=4"
 # modes only.  Entries specified as foreground/background.
 #GRUB_COLOR_NORMAL="light-blue/black"
 #GRUB_COLOR_HIGHLIGHT="light-cyan/blue"
-GRUB_THEME="/home/jrrom/nixos-jrrom/common/tartarus/theme.txt"
+GRUB_THEME="/home/jrrom/dotfiles/root/tartarus/theme.txt"

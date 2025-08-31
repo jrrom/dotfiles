@@ -97,9 +97,9 @@ function main -d "Controls Home Manager and ETC files"
             home-manager switch --flake .#void
             echo
             echo "Caching fonts..."
-	    echo "Home Manager adds nix-profile to DATA_DIRS"
+	        echo "Home Manager adds nix-profile to DATA_DIRS"
             echo
-	    fc-cache -fv
+	        fc-cache -fv
             if test $status -ne 0
                echo "Failed to cache fonts."
                return 1

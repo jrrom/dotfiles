@@ -1,0 +1,4 @@
+#+TITLE: jrrom's Literate Configurations
+
+* Reasoning
+Hello, I'm [[www.github.com/jrrom][jrrom]]. This is my literate configuration for my daily use. I use [[https://www.gnu.org/software/stow/][GNU Stow]] for keeping track of my dotfiles. I used to use [[https://github.com/nix-community/home-manager][home-manager]] but I dislike the Nix interface and prefer doing it "directly." I may also go back to NixOS, in which case I would like to keep a literate configuration for NixOS itself. This  is not possible using home-manager. If you see anything you like then feel free to copy, but I would humbly request you to make your configuration public in return - I also want to learn.

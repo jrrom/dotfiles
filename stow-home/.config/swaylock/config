@@ -1,5 +1,5 @@
 image=~/.config/sway/bg.png
-font=Iosevka Comfy Wide
+font=Maple Mono
 font-size=40
 scaling=fill
 indicator-x-position=965

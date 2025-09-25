@@ -136,7 +136,7 @@
   (savehist-mode 1)                         ;; Save history
   (recentf-mode 1)                          ;; Keep track of recent files!
   (auto-revert-mode 1)                      ;; Keeps your Emacs buffers in sync with external changes
-  (setq-default indent-tabs-mode nil)                    ;; Disable the use of tabs for indentation (use spaces instead).
+  (setq-default indent-tabs-mode nil)       ;; Disable the use of tabs for indentation (use spaces instead).
   (prefer-coding-system 'utf-8)             ;; Only UTF8 here
   (setq-default cursor-type 'box))
 
@@ -377,6 +377,16 @@
 
 (use-package fish-mode
   :ensure t)
+
+;; For conf-mode (ini/conf files)
+(use-package conf-mode
+  :ensure nil   ;; it's built-in
+  :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
+
+;; For Makefiles (needs tabs)
+(use-package make-mode
+  :ensure nil
+  :hook (makefile-mode . (lambda () (setq indent-tabs-mode t))))
 
 (use-package dired
   :custom

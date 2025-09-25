@@ -779,7 +779,7 @@ exec nicotine -s &
 
 #+begin_src conf :tangle ./stow-home/.config/swaylock/config
 image=~/.config/sway/bg.png
-font=Iosevka Comfy Wide
+font=Maple Mono
 font-size=40
 scaling=fill
 indicator-x-position=965
@@ -815,6 +815,7 @@ text-caps-lock-color=d3869b
 text-ver-color=fabd2f
 text-wrong-color=fb4934
 #+end_src
+
 ** Waybar
 It is close to hell so I won't touch it.
 

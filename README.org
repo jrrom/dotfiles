@@ -5,11 +5,13 @@ Hello, I'm [[www.github.com/jrrom][jrrom]]. This is my literate configuration fo
 
 I am trying to move away from NixOS, and currently in the process of doing so. This is very much still a work in progress.
 
-* TODO
+* To Be Completed
 ** Pre-Migration
+- [ ] Clean up Firefox Mozilla bookmarks, manage Mozilla account
 - [ ] Save music, documents and files.
 - [ ] Clean up emails and email accounts, etc...
 - [ ] Clean up computer and work on moving certain things online <-- Centralise and standardise
+- [ ] Clean up online drive
 - [ ] Finish website
 - [ ] Complete parkour game
 - [ ] Migrate to Gentoo and remove Nix

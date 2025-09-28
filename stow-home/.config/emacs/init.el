@@ -172,6 +172,7 @@
   (org-src-preserve-indentation t)
   (org-startup-indented t)               ; Needed for org-modern-indent
   (org-edit-src-content-indentation 0)
+  (org-modern-checkbox nil)              ; No fancy unicode checkboxes please
   :config
   (jrrom/org-face-sizes))
 
@@ -209,6 +210,13 @@
   :ensure t
   :bind
   ("M-j" . avy-goto-char-timer))
+
+(use-package completion-preview
+  :hook (prog-mode . completion-preview-mode)
+  :bind
+  (:map completion-preview-active-mode-map
+        ("M-n" . completion-preview-next-candidate)
+        ("M-p" . completion-preview-prev-candidate)))
 
 (use-package vertico
   :ensure t
@@ -472,14 +480,17 @@
 (use-package emms
   :ensure t
   :config
-  (setq emms-player-list '(emms-player-mpd emms-player-mpv)
-        emms-info-functions '(emms-info-mpd)
-        emms-player-mpd-server-name "localhost"
-        emms-player-mpd-server-port 6600
-        emms-volume-change-function 'emms-volume-mpd-change)
-  (emms-standard)
-  (add-hook 'emms-playlist-cleared-hook #'emms-player-mpd-clear)
-  (emms-player-mpd-connect))
+  (require 'emms-player-mpv)
+  (require 'emms-player-mplayer)
+  (emms-all)
+  (setq emms-player-list '(emms-player-mplayer emms-player-mpv)
+        emms-info-functions '(emms-info-exiftool emms-info-native)
+        emms-cache-file "~/.config/emacs/emms/cache")
+  (emms-cache-enable)
+
+  (add-hook 'emms-tag-editor-mode-hook
+            (lambda ()
+              (setq-local face-remapping-alist '((default fixed-pitch))))))
 
 (defun emms-jrrom-player ()
   "jrrom's music player setup for EMMS"
@@ -487,10 +498,8 @@
   (select-frame-set-input-focus
    (make-frame
     '((emms-frame . t)))) ;; Setting property
-  (emms-browse-by-album)
-  (split-window-right)
-  (other-window 1)
-  (emms))
+  (emms)
+  (emms-mark-mode))
 
 (defun emms-jrrom-close ()
   "Close the current EMMS frame and related buffers"

@@ -1,6 +1,7 @@
 (defun jrrom/org-babel-tangle-config ()
   (when (or (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Emacs.org"))
-			(string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Programs.org")))
+			(string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Programs.org"))
+            (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Sway.org")))
     (org-element-cache-reset)
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
@@ -42,7 +43,8 @@
   :custom
   (nerd-icons-font-family "Symbols Nerd Font Mono"))
 
-  (use-package ligature
+(use-package ligature
+  :ensure t
   :config
   (ligature-set-ligatures
    '(prog-mode org-mode)
@@ -386,6 +388,8 @@
 (use-package fish-mode
   :ensure t)
 
+(use-package ebuild-mode) ;; ensure nil
+
 ;; For conf-mode (ini/conf files)
 (use-package conf-mode
   :ensure nil   ;; it's built-in
@@ -507,3 +511,15 @@
   (dolist (frame (frame-list))
     (when (frame-parameter frame 'emms-frame)
       (delete-frame frame))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

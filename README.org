@@ -8,16 +8,10 @@ I am trying to move away from NixOS, and currently in the process of doing so. T
 * To Be Completed
 ** Pre-Migration
 - [ ] Clean up emails and email accounts, etc...
-- [ ] Clean up computer and work on moving certain things online <-- Centralise and standardise
 - [ ] Finish website
 - [ ] Complete parkour game
-- [ ] Migrate to Gentoo and remove Nix
 - [ ] Document entire process on website
-- [ ] Delete the root directory in dotfiles
-- [ ] Use Systemd boot
 ** Post Migration
-- [ ] Add font and theme to personal Gentoo overlay along with other effects
 - [ ] Writeup of all dependencies and packages (least no. of packages for most gain)
-- [ ] No greetd, make a user Systemd service that runs sway
 - [ ] Use Systemd brightness service
 - [ ] Fix sway and waybar

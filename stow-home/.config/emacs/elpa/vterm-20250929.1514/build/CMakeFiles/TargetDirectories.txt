@@ -1,0 +1,5 @@
+/home/jrrom/.config/emacs/elpa/vterm-20250929.1514/build/CMakeFiles/vterm-module.dir
+/home/jrrom/.config/emacs/elpa/vterm-20250929.1514/build/CMakeFiles/libvterm.dir
+/home/jrrom/.config/emacs/elpa/vterm-20250929.1514/build/CMakeFiles/run.dir
+/home/jrrom/.config/emacs/elpa/vterm-20250929.1514/build/CMakeFiles/edit_cache.dir
+/home/jrrom/.config/emacs/elpa/vterm-20250929.1514/build/CMakeFiles/rebuild_cache.dir

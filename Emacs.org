@@ -8,22 +8,20 @@ Doing auto-tangle on saving the config file.
 #+begin_src emacs-lisp
 (defun jrrom/org-babel-tangle-config ()
   (when (or (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Emacs.org"))
-			(string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Programs.org")))
+			(string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Programs.org"))
+            (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Sway.org")))
     (org-element-cache-reset)
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'jrrom/org-babel-tangle-config)))
 #+end_src
-
 ** Performance Settings
 Given by [[https://github.com/LionyxML/emacs-kick/blob/master/init.el][emacs-kick]]. Thanks!
 
 #+begin_quote
-Emacs is an Elisp interpreter, and when running programs or packages,
-it can occasionally experience pauses due to garbage collection.
-By increasing the garbage collection threshold, we reduce these pauses
-during heavy operations, leading to smoother performance.
+Emacs is an Elisp interpreter, and when running programs or packages, it can occasionally experience pauses due to garbage collection.
+By increasing the garbage collection threshold, we reduce these pauses during heavy operations, leading to smoother performance.
 
 Set the maximum output size for reading process output, allowing for larger data transfers.
 #+end_quote
@@ -40,7 +38,6 @@ Some other performance settings that I forgot where they came from or if they ev
 (setenv "LSP_USE_PLISTS" "true")         ;; Use PLISTS instead of JSON
 (setq pgtk-wait-for-event-timeout nil)   ;; Don't wait for events to complete?
 #+end_src
-
 * Package Management
 ** MELPA
 Adding archives & stuff.
@@ -54,7 +51,6 @@ Adding archives & stuff.
 (unless package-archive-contents
   (package-refresh-contents))
 #+end_src
-
 * Utility and Appearance
 ** Fonts
 Some basic font setup.
@@ -75,7 +71,6 @@ Some basic font setup.
   :custom
   (mixed-pitch-variable-pitch-cursor 'box))
 #+end_src
-
 ** Nerd Icons
 Installing the main package
 
@@ -85,11 +80,10 @@ Installing the main package
   :custom
   (nerd-icons-font-family "Symbols Nerd Font Mono"))
 #+end_src
-
 ** Ligatures
-
 #+begin_src emacs-lisp
-  (use-package ligature
+(use-package ligature
+  :ensure t
   :config
   (ligature-set-ligatures
    '(prog-mode org-mode)
@@ -131,7 +125,6 @@ Installing the main package
      "---" "ll" ".?" "<!--"))
   (global-ligature-mode t))
 #+end_src
-
 ** Main
 General configuration of Emacs. Huge thanks to [[https://github.com/LionyxML/emacs-kick/blob/master/init.el][emacs-kick]].
 
@@ -192,9 +185,6 @@ General configuration of Emacs. Huge thanks to [[https://github.com/LionyxML/ema
   (prefer-coding-system 'utf-8)             ;; Only UTF8 here
   (setq-default cursor-type 'box))
 #+end_src
-
-- [ ] Add (treesit-font-lock-level 4) to treesit directly instead of in Emacs.
-  
 ** Scratch Buffer
 Removing line numbers from the scratch buffer.
 
@@ -204,7 +194,6 @@ Removing line numbers from the scratch buffer.
             (with-current-buffer "*scratch*"
               (display-line-numbers-mode -1))))
 #+end_src
-
 ** Theme
 My Emacs theme!
 
@@ -213,7 +202,6 @@ My Emacs theme!
   :ensure t
   :config (load-theme 'gruvbox-dark-medium t nil))
 #+end_src
-
 ** Modern Org
 Making Org look a bit nice. Also making the title large. I set the face sizes and reduce the default indentation of src blocks to 0 to avoid indentation glitches.
 
@@ -256,7 +244,6 @@ Making Org look a bit nice. Also making the title large. I set the face sizes an
   :config ; add late to hook
   (add-hook 'org-mode-hook #'org-modern-indent-mode))
 #+end_src
-
 * QoL
 ** Repeat
 Repeat commands by spamming the last key of the command
@@ -276,7 +263,6 @@ Shows keybindings!
   (which-key-setup-side-window-right-bottom)
   (which-key-mode))
 #+end_src
-
 ** Eldoc
 Integrates amazingly with Eglot
 
@@ -290,7 +276,6 @@ Integrates amazingly with Eglot
   :bind
   ("C-h ." . eldoc-box-help-at-point))
 #+end_src
-
 ** Avy
 Somewhat useful
 
@@ -300,7 +285,6 @@ Somewhat useful
   :bind
   ("M-j" . avy-goto-char-timer))
 #+end_src
-
 ** Completion Preview Mode
 Autocompletions! Use M-n and M-p to cycle between completions.
 
@@ -312,7 +296,6 @@ Autocompletions! Use M-n and M-p to cycle between completions.
         ("M-n" . completion-preview-next-candidate)
         ("M-p" . completion-preview-prev-candidate)))
 #+end_src
-
 * VEMCO
 ** Vertico
 Autocompletions  
@@ -328,7 +311,6 @@ Autocompletions  
   :init
   (vertico-mode))
 #+end_src
-
 ** Embark
 Actions at a point.
 
@@ -357,7 +339,6 @@ Actions at a point.
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
-
 ** Marginalia
 Provides annotations / marginalia to completion candidates!
 
@@ -469,7 +450,6 @@ Completing read.
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
 )
 #+end_src
-
 ** Orderless
 Regexp and literal matches for things.
 
@@ -480,7 +460,6 @@ Regexp and literal matches for things.
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
-
 * Development
 ** Treesitter
 I am using this strange code snippet that I got online.
@@ -494,7 +473,6 @@ I am using this strange code snippet that I got online.
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 #+end_src
-
 ** Org Babel
 Adding org-src support to some languages.
 Huge thanks to [[https://github.com/kwpav/dotfiles/blob/master/emacs.org#org-babel][kwpav]] for showing :no-require in the config.
@@ -514,7 +492,6 @@ Huge thanks to [[https://github.com/kwpav/dotfiles/blob/master/emacs.org#org-bab
 	 (emacs-lisp . t)
 	 (shell . t))))
 #+end_src
-
 * Programming
 ** Fish Mode
 Adds support for the Fish shell.
@@ -523,9 +500,13 @@ Adds support for the Fish shell.
 (use-package fish-mode
   :ensure t)
 #+end_src
+** E-Build Mode
+You must install it with Portage
 
+#+begin_src emacs-lisp
+(use-package ebuild-mode) ;; ensure nil
+#+end_src
 ** Tab Things
-
 #+begin_src emacs-lisp
 ;; For conf-mode (ini/conf files)
 (use-package conf-mode
@@ -537,7 +518,6 @@ Adds support for the Fish shell.
   :ensure nil
   :hook (makefile-mode . (lambda () (setq indent-tabs-mode t))))
 #+end_src
-
 * Functions
 ** File Management
 Basic dired setup.
@@ -575,7 +555,6 @@ Basic dired setup.
 (use-package dired-open-with
   :ensure t)
 #+end_src
-
 ** Dirvish
 Enhancing ~dired~ with Dirvish! A huge thank you to [[https://config.phundrak.com/emacs/packages/emacs-builtin.html#dired][phundrak's config]] and the default [[https://github.com/alexluigit/dirvish/blob/main/docs/CUSTOMIZING.org][docs]].
 Requires ~fd poppler ffmpegthumbnailer mediainfo imagemagick tar unzip 7zip vips and zathura~
@@ -618,7 +597,6 @@ Requires ~fd poppler ffmpegthumbnailer mediainfo imagemagick tar unzip 7zip vips
    ("TAB" . dirvish-subtree-toggle)
    ("M-e" . dirvish-emerge-menu)))
 #+end_src
-
 ** Terminal Emulator
 Note: requires libvterm and libtool to be installed. (!)
 
@@ -639,7 +617,6 @@ Adding a keybinding to open vterm in a new frame!
   (select-frame-set-input-focus (make-frame))
   (vterm))
 #+end_src
-
 ** Multimedia
 Note: requires mpd and mpv to be installed. (!)
 *Educational*! We can't put setq as custom because the variables need to be set before
@@ -681,4 +658,3 @@ Creating a new frame only for music!
     (when (frame-parameter frame 'emms-frame)
       (delete-frame frame))))
 #+end_src
-

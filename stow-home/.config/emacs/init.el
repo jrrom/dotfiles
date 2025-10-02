@@ -27,8 +27,8 @@
   (set-face-attribute 'default nil :font "Maple Mono-15")
   (set-face-attribute 'fixed-pitch nil :family "Maple Mono"))
 
-(when (member "Ubuntu Sans" (font-family-list))
-  (set-face-attribute 'variable-pitch nil :font "Ubuntu Sans-17"))
+(when (member "Noto Sans" (font-family-list))
+  (set-face-attribute 'variable-pitch nil :font "Noto Sans-16"))
 
 ;; Mixed pitch mode
 (use-package mixed-pitch
@@ -511,15 +511,3 @@
   (dolist (frame (frame-list))
     (when (frame-parameter frame 'emms-frame)
       (delete-frame frame))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

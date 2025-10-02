@@ -60,8 +60,8 @@ Some basic font setup.
   (set-face-attribute 'default nil :font "Maple Mono-15")
   (set-face-attribute 'fixed-pitch nil :family "Maple Mono"))
 
-(when (member "Ubuntu Sans" (font-family-list))
-  (set-face-attribute 'variable-pitch nil :font "Ubuntu Sans-17"))
+(when (member "Noto Sans" (font-family-list))
+  (set-face-attribute 'variable-pitch nil :font "Noto Sans-16"))
 
 ;; Mixed pitch mode
 (use-package mixed-pitch

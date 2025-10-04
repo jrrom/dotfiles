@@ -9,7 +9,8 @@ Doing auto-tangle on saving the config file.
 (defun jrrom/org-babel-tangle-config ()
   (when (or (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Emacs.org"))
 			(string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Programs.org"))
-            (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Sway.org")))
+            (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Sway.org"))
+            (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/EWW.org")))
     (org-element-cache-reset)
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
@@ -62,6 +63,9 @@ Some basic font setup.
 
 (when (member "Noto Sans" (font-family-list))
   (set-face-attribute 'variable-pitch nil :font "Noto Sans-16"))
+
+;; Nerd Icons Setup
+(set-fontset-font t nil (font-spec :family "Symbols Nerd Font Mono") nil 'append)
 
 ;; Mixed pitch mode
 (use-package mixed-pitch
@@ -128,6 +132,7 @@ Installing the main package
 ** Main
 General configuration of Emacs. Huge thanks to [[https://github.com/LionyxML/emacs-kick/blob/master/init.el][emacs-kick]].
 
+
 #+begin_src emacs-lisp
 (use-package emacs
   :custom
@@ -140,6 +145,8 @@ General configuration of Emacs. Huge thanks to [[https://github.com/LionyxML/ema
   (use-short-answers t)                     ;; Use short answers in prompts for quicker responses (y instead of yes)
   (global-auto-revert-non-file-buffers t)   ;; In conjunction with (global-auto-revert-mode 1) allows to keep up-to-date
   (recentf-max-saved-items 100)             ;; number of files to remember with recentf
+  (visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+  (global-visual-line-mode 1)               ;; Visual line mode wrapping
 
   ;; Vertico support
   ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
@@ -470,8 +477,8 @@ I am using this strange code snippet that I got online.
   :custom
   (treesit-auto-install 'prompt)
   :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+  (treesit-auto-add-to-auto-mode-alist 'all))
+;;  (global-treesit-auto-mode))
 #+end_src
 ** Org Babel
 Adding org-src support to some languages.
@@ -500,11 +507,27 @@ Adds support for the Fish shell.
 (use-package fish-mode
   :ensure t)
 #+end_src
+** Clojure Mode
+Adds Clojure support.
+
+#+begin_src emacs-lisp
+(use-package clojure-mode
+  :ensure t)
+#+end_src
 ** E-Build Mode
 You must install it with Portage
 
 #+begin_src emacs-lisp
 (use-package ebuild-mode) ;; ensure nil
+#+end_src
+** Yuck Mode
+For EWW (Elkowar's Wacky Widgets)
+
+#+begin_src emacs-lisp
+(use-package yuck-mode
+  :ensure t
+  :hook
+  (yuck-mode . (lambda () (setq-local lisp-indent-function #'common-lisp-indent-function))))
 #+end_src
 ** Tab Things
 #+begin_src emacs-lisp

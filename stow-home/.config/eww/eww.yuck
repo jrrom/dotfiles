@@ -1,0 +1,65 @@
+(defpoll time :interval "1s"  "date '+%a  %b %d  %H:%M:%S'")
+(defpoll cal  :interval "1h"  "cal | sed '1d;$d'")
+
+(defwindow bar
+    :monitor 0
+    :geometry
+    (geometry :x "0%"
+              :y "0%"
+              :width "100%"
+              :anchor "top center")
+    :stacking "fg"
+    :exclusive true
+    :focusable false
+    :namespace "dock"
+    (main))
+
+(defwidget main []
+  (centerbox
+   :orientation "horizontal"
+   
+   (module :halign "start"
+    (workspaces))
+   
+   (module
+    (time))
+   
+   (module :halign "end"
+    (tray))
+ ))
+
+(defwidget module [?halign]
+  (box
+   :halign halign
+   :orientation "horizontal"
+   (children)))
+
+(defwidget time []
+  (box
+   :tooltip "${cal}"
+   (label :text "${time}")))
+
+(defvar workspace-object-array `[
+   {"symbol": "", "number": 1},
+   {"symbol": "", "number": 2},
+   {"symbol": "", "number": 3},
+   {"symbol": "󰈹", "number": 4},
+   {"symbol": "", "number": 5},
+   {"symbol": "", "number": 6}
+]`)
+
+(defwidget workspaces []
+  (box
+   :orientation "horizontal"
+   :halign "start"
+   (for workspace in workspace-object-array
+        (button
+         :onclick `swaymsg workspace ${workspace.number}`
+         `${workspace.symbol}`))))
+
+(defwidget tray []
+  (box
+   :orientation "horizontal"
+   :halign "start"
+   (systray :spacing 10
+            :orientation "horizontal")))

@@ -1,0 +1,91 @@
+#+TITLE:jrrom's EWW Configuration
+#+PROPERTY: header-args:yuck :tangle ./stow-home/.config/eww/eww.yuck
+
+* Scripts
+** Current Workspace
+
+* Pollers
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defpoll time :interval "1s"  "date '+%a  %b %d  %H:%M:%S'")
+(defpoll cal  :interval "1h"  "cal | sed '1d;$d'")
+#+end_src
+* Bar
+** Window
+Height is defined in CSS.
+
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwindow bar
+    :monitor 0
+    :geometry
+    (geometry :x "0%"
+              :y "0%"
+              :width "100%"
+              :anchor "top center")
+    :stacking "fg"
+    :exclusive true
+    :focusable false
+    :namespace "dock"
+    (main))
+#+end_src
+** Main
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwidget main []
+  (centerbox
+   :orientation "horizontal"
+   
+   (module :halign "start"
+    (workspaces))
+   
+   (module
+    (time))
+   
+   (module :halign "end"
+    (tray))
+ ))
+#+end_src
+** Module
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwidget module [?halign]
+  (box
+   :halign halign
+   :orientation "horizontal"
+   (children)))
+#+end_src
+** Wacky Widgets
+*** Time
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwidget time []
+  (box
+   :tooltip "${cal}"
+   (label :text "${time}")))
+#+end_src
+*** Workspaces
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defvar workspace-object-array `[
+   {"symbol": "", "number": 1},
+   {"symbol": "", "number": 2},
+   {"symbol": "", "number": 3},
+   {"symbol": "󰈹", "number": 4},
+   {"symbol": "", "number": 5},
+   {"symbol": "", "number": 6}
+]`)
+
+(defwidget workspaces []
+  (box
+   :orientation "horizontal"
+   :halign "start"
+   (for workspace in workspace-object-array
+        (button
+         :onclick `swaymsg workspace ${workspace.number}`
+         `${workspace.symbol}`))))
+#+end_src
+*** System Tray
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwidget tray []
+  (box
+   :orientation "horizontal"
+   :halign "start"
+   (systray :spacing 10
+            :orientation "horizontal")))
+#+end_src
+

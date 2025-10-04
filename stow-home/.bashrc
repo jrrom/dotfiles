@@ -19,8 +19,20 @@ fi
 
 # Important environment variables before anything else
 export HISTFILE="${XDG_STATE_HOME}"/bash/history
+export XDG_CURRENT_DESKTOP=Sway
+export GTK_THEME='adw-gtk3-dark'
+alias wget="wget --hsts-file=$XDG_DATA_HOME/wget-hsts"
 
+# Important for environment (from https://github.com/swaywm/sway/wiki/Running-programs-natively-under-wayland)
+export QT_QPA_PLATFORM=wayland-egl
+export QT_WAYLAND_FORCE_DPI=physical
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 
+export ECORE_EVAS_ENGINE=wayland_egl
+export ELM_ENGINE=wayland_egl
+export SDL_VIDEODRIVER=wayland
+
+export _JAVA_AWT_WM_NONREPARENTING=1
 
 # Fish Support
 [ -x /bin/fish ] && SHELL=/bin/fish exec fish

@@ -1,7 +1,8 @@
 (defun jrrom/org-babel-tangle-config ()
   (when (or (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Emacs.org"))
 			(string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Programs.org"))
-            (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Sway.org")))
+            (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/Sway.org"))
+            (string-equal (buffer-file-name) (expand-file-name "~/dotfiles/EWW.org")))
     (org-element-cache-reset)
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
@@ -29,6 +30,9 @@
 
 (when (member "Noto Sans" (font-family-list))
   (set-face-attribute 'variable-pitch nil :font "Noto Sans-16"))
+
+;; Nerd Icons Setup
+(set-fontset-font t nil (font-spec :family "Symbols Nerd Font Mono") nil 'append)
 
 ;; Mixed pitch mode
 (use-package mixed-pitch
@@ -97,6 +101,8 @@
   (use-short-answers t)                     ;; Use short answers in prompts for quicker responses (y instead of yes)
   (global-auto-revert-non-file-buffers t)   ;; In conjunction with (global-auto-revert-mode 1) allows to keep up-to-date
   (recentf-max-saved-items 100)             ;; number of files to remember with recentf
+  (visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+  (global-visual-line-mode 1)               ;; Visual line mode wrapping
 
   ;; Vertico support
   ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
@@ -368,8 +374,8 @@
   :custom
   (treesit-auto-install 'prompt)
   :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+  (treesit-auto-add-to-auto-mode-alist 'all))
+;;  (global-treesit-auto-mode))
 
 (use-package org-contrib
   :ensure t
@@ -388,7 +394,15 @@
 (use-package fish-mode
   :ensure t)
 
+(use-package clojure-mode
+  :ensure t)
+
 (use-package ebuild-mode) ;; ensure nil
+
+(use-package yuck-mode
+  :ensure t
+  :hook
+  (yuck-mode . (lambda () (setq-local lisp-indent-function #'common-lisp-indent-function))))
 
 ;; For conf-mode (ini/conf files)
 (use-package conf-mode
@@ -511,3 +525,19 @@
   (dolist (frame (frame-list))
     (when (frame-parameter frame 'emms-frame)
       (delete-frame frame))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(avy clojure-mode dired-open-with dirvish eldoc-box embark-consult
+         emms fish-mode gruvbox-theme ligature marginalia mixed-pitch
+         nerd-icons orderless org-contrib org-modern org-modern-indent
+         treesit-auto vertico vterm yuck-mode)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

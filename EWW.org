@@ -33,13 +33,15 @@ Height is defined in CSS.
   (centerbox
    :orientation "horizontal"
    
-   (module :halign "start"
+   (module
+    :halign "start"
     (workspaces))
    
    (module
     (time))
    
-   (module :halign "end"
+   (module
+    :halign "end"
     (tray))
  ))
 #+end_src
@@ -52,13 +54,6 @@ Height is defined in CSS.
    (children)))
 #+end_src
 ** Wacky Widgets
-*** Time
-#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
-(defwidget time []
-  (box
-   :tooltip "${cal}"
-   (label :text "${time}")))
-#+end_src
 *** Workspaces
 #+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
 (defvar workspace-object-array `[
@@ -78,6 +73,14 @@ Height is defined in CSS.
         (button
          :onclick `swaymsg workspace ${workspace.number}`
          `${workspace.symbol}`))))
+#+end_src
+
+*** Time
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwidget time []
+  (box
+   :tooltip "${cal}"
+   (label :text "${time}")))
 #+end_src
 *** System Tray
 #+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck

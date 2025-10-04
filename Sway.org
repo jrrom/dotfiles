@@ -16,7 +16,7 @@ set $menu wmenu-run
 #+end_src
 * Wallpaper
 #+begin_src conf
-output * bg ~/dotfiles/wallpapers/blue-lake-1920x1200.png fill
+output * mode 1920x1200 pos 0 0 bg ~/dotfiles/wallpapers/blue-lake-1920x1200.png stretch
 #+end_src
 * Keybindings
 Note: I do not use the Sway scratchpad.
@@ -144,7 +144,8 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 #+end_src
 * Status Bar
-TODO
+#+begin_src conf
+#+end_src
 * General
 ** Styles
 #+begin_src conf
@@ -182,22 +183,19 @@ workspace_auto_back_and_forth no
 
 set $gnome-schema org.gnome.desktop.interface
 exec_always {
-    gsettings set $gnome-schema gtk-theme 'adw-gtk3-dark'
+    gsettings set $gnome-schema color-scheme 'prefer-dark'
+	gsettings set $gnome-schema gtk-theme 'adw-gtk3-dark'
     gsettings set $gnome-schema icon-theme 'Tela'
     gsettings set $gnome-schema cursor-theme 'Bibata-Modern-Ice'
     gsettings set $gnome-schema cursor-size 32
     gsettings set $gnome-schema font-name 'Noto Sans 12'
+
 }
 
 for_window [window_type="dialog"] floating enable
 for_window [window_role="dialog"] floating enable
 for_window [app_id="flameshot"] floating enable
-#+end_src
-** Autostart
-#+begin_src conf
-exec mako
-exec nm-applet
-exec flameshot
+for_window [app_id="nm-connection-editor"] floating enable
 #+end_src
 ** Keyboard
 #+begin_src conf
@@ -205,4 +203,11 @@ input "*" {
   xkb_layout us
   xkb_options ctrl:swapcaps
 }
+#+end_src
+** Autostart
+#+begin_src conf
+exec mako
+exec nm-applet
+exec sleep 5 && flameshot
+exec eww open bar
 #+end_src

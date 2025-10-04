@@ -18,13 +18,15 @@
   (centerbox
    :orientation "horizontal"
    
-   (module :halign "start"
+   (module
+    :halign "start"
     (workspaces))
    
    (module
     (time))
    
-   (module :halign "end"
+   (module
+    :halign "end"
     (tray))
  ))
 
@@ -33,11 +35,6 @@
    :halign halign
    :orientation "horizontal"
    (children)))
-
-(defwidget time []
-  (box
-   :tooltip "${cal}"
-   (label :text "${time}")))
 
 (defvar workspace-object-array `[
    {"symbol": "", "number": 1},
@@ -56,6 +53,11 @@
         (button
          :onclick `swaymsg workspace ${workspace.number}`
          `${workspace.symbol}`))))
+
+(defwidget time []
+  (box
+   :tooltip "${cal}"
+   (label :text "${time}")))
 
 (defwidget tray []
   (box

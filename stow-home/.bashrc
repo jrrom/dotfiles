@@ -4,18 +4,16 @@
 # including some apparently interactive shells such as scp and rcp
 # that can't tolerate any output.  So make sure this doesn't display
 # anything or bad things will happen !
+# XDG directories
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
 
-
-# Test for an interactive shell.  There is no need to set anything
-# past this point for scp and rcp, and it's important to refrain from
-# outputting anything in those cases.
-if [[ $- != *i* ]] ; then
-	# Shell is non-interactive.  Be done now!
-	return
-fi
-
-
-# Put your fun stuff here.
+# Cleaning the $HOME
+export DOTNET_CLI_HOME="$XDG_DATA_HOME/dotnet"
+export INPUTRC="$XDG_CONFIG_HOME/readline/inputrc"
+export _JAVA_OPTIONS="-Djava.util.prefs.userRoot=$XDG_CONFIG_HOME/java"
 
 # Important environment variables before anything else
 export HISTFILE="${XDG_STATE_HOME}"/bash/history
@@ -33,6 +31,14 @@ export ELM_ENGINE=wayland_egl
 export SDL_VIDEODRIVER=wayland
 
 export _JAVA_AWT_WM_NONREPARENTING=1
+
+# Test for an interactive shell.  There is no need to set anything
+# past this point for scp and rcp, and it's important to refrain from
+# outputting anything in those cases.
+if [[ $- != *i* ]] ; then
+	# Shell is non-interactive.  Be done now!
+	return
+fi
 
 # Fish Support
 [ -x /bin/fish ] && SHELL=/bin/fish exec fish

@@ -2,4 +2,4 @@
 filesystems=~/.fonts:ro;~/.icons:ro;~/.themes:ro;/nix/store:ro
 
 [Environment]
-GTK_THEME=Gruvbox-Yellow-Dark-Medium
+GTK_THEME=adw-gtk3-dark

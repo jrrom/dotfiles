@@ -536,6 +536,10 @@ For EWW (Elkowar's Wacky Widgets)
   :ensure nil   ;; it's built-in
   :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
 
+(use-package ebuild-mode
+  :ensure nil
+  :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
+
 ;; For Makefiles (needs tabs)
 (use-package make-mode
   :ensure nil

@@ -409,6 +409,10 @@
   :ensure nil   ;; it's built-in
   :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
 
+(use-package ebuild-mode
+  :ensure nil
+  :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
+
 ;; For Makefiles (needs tabs)
 (use-package make-mode
   :ensure nil
@@ -525,19 +529,3 @@
   (dolist (frame (frame-list))
     (when (frame-parameter frame 'emms-frame)
       (delete-frame frame))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(avy clojure-mode dired-open-with dirvish eldoc-box embark-consult
-         emms fish-mode gruvbox-theme ligature marginalia mixed-pitch
-         nerd-icons orderless org-contrib org-modern org-modern-indent
-         treesit-auto vertico vterm yuck-mode)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

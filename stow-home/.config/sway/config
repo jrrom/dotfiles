@@ -9,7 +9,9 @@ set $right l
 set $main emacs
 set $menu wmenu-run
 
-output * mode 1920x1200 pos 0 0 bg ~/dotfiles/wallpapers/blue-lake-1920x1200.png stretch
+output eDP-1 mode 1920x1200 bg /home/jrrom/dotfiles/wallpapers/blue-lake-1920x1200.png fill
+
+exec eww daemon
 
 # Start main program
 bindsym $mod+Return exec $main
@@ -123,8 +125,6 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
-
-
 font pango: Noto Sans 12
 default_border normal 2
 default_floating_border normal 2
@@ -178,5 +178,5 @@ input "*" {
 
 exec mako
 exec nm-applet
-exec sleep 5 && flameshot
+exec flameshot
 exec eww open bar

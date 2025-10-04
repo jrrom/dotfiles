@@ -16,7 +16,11 @@ set $menu wmenu-run
 #+end_src
 * Wallpaper
 #+begin_src conf
-output * mode 1920x1200 pos 0 0 bg ~/dotfiles/wallpapers/blue-lake-1920x1200.png stretch
+output eDP-1 mode 1920x1200 bg /home/jrrom/dotfiles/wallpapers/blue-lake-1920x1200.png fill
+#+end_src
+* EWW Daemon
+#+begin_src conf
+exec eww daemon
 #+end_src
 * Keybindings
 Note: I do not use the Sway scratchpad.
@@ -143,9 +147,6 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 #+end_src
-* Status Bar
-#+begin_src conf
-#+end_src
 * General
 ** Styles
 #+begin_src conf
@@ -208,6 +209,6 @@ input "*" {
 #+begin_src conf
 exec mako
 exec nm-applet
-exec sleep 5 && flameshot
+exec flameshot
 exec eww open bar
 #+end_src

@@ -252,6 +252,7 @@ Making Org look a bit nice. Also making the title large. I set the face sizes an
   (add-hook 'org-mode-hook #'org-modern-indent-mode))
 #+end_src
 * QoL
+** 
 ** Repeat
 Repeat commands by spamming the last key of the command
 

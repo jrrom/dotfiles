@@ -1,5 +1,79 @@
-(defpoll time :interval "1s"  "date '+%a  %b %d  %H:%M:%S'")
-(defpoll cal  :interval "1h"  "cal | sed '1d;$d'")
+(defpoll time       :interval "1s"  "date '+%a  %b %d  %H:%M:%S'")
+(defpoll volume     :interval "5s"  "wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -oE '[0-9]+\.[0-9]+'")
+(defpoll brightness :interval "10s" "brightnessctl get")
+
+(defwindow cal
+    :monitor 0
+    :geometry
+    (geometry :x "0%"
+              :y "5px"
+              :width "14%"
+              :height "15%"
+              :anchor "top center")
+    :stacking "fg"
+    :exclusive false
+    :focusable false
+    :namespace "bar"
+    (eventbox
+     :cursor "pointer"
+     (calendar)))
+
+(defwidget time []
+  (eventbox
+   :onclick "eww open --toggle cal"
+   :cursor "help"
+   :tooltip "Time"
+   (label :text "${time}")))
+
+(defvar workspace-object-array `[
+   {"symbol": "", "number": 1},
+   {"symbol": "", "number": 2},
+   {"symbol": "", "number": 3},
+   {"symbol": "󰈹", "number": 4},
+   {"symbol": "", "number": 5},
+   {"symbol": "", "number": 6}
+]`)
+
+(defwidget workspaces []
+  (box
+   :orientation "horizontal"
+   (for workspace in workspace-object-array
+        (button
+         :onclick `swaymsg workspace ${workspace.number}`
+         `${workspace.symbol}`))))
+
+(defwidget cpu []
+  (label :text " ${floor(EWW_CPU.avg)}%"))
+
+(defwidget ram []
+  (label :text " ${floor(EWW_RAM.used_mem_perc)}%"))
+
+(defvar volume-icons `["", "", "", "", ""]`)
+
+(defwidget volume []
+  (eventbox
+   :cursor "pointer"
+   :onclick `swaymsg '[title="Volume Control"] move container to workspace current' || pavucontrol &`
+   :onscroll `~/dotfiles/scripts/volume.clj -s {} -v 0.03`
+   (label :text "${volume-icons[floor(volume * 100 / 25)]} ${floor(volume * 100)}%")))
+
+(defvar brightness-icons `["󱩎", "󱩏", "󱩐", "󱩑", "󱩒", "󱩓", "󱩔", "󱩕", "󱩖", "󰛨", "󰛨"]`)
+
+(defwidget brightness []
+  (eventbox
+   :onscroll `brightnessctl s $([[ "{}" == up ]] && echo +2% || echo 2%-) && eww update brightness="$(brightnessctl g)"`
+   (label :text `${brightness-icons[floor(brightness * 10 / 255)]} ${floor(brightness * 100 / 255)}%`)))
+
+(defvar battery-charging-icons `["󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"]`)
+(defvar battery-icons          `["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂"]`)
+
+(defwidget battery []
+   (label
+    :tooltip `${EWW_BATTERY["BAT0"].status}`
+    :text
+    `${EWW_BATTERY["BAT0"].status == "Charging"
+         ? battery-charging-icons[floor(EWW_BATTERY["BAT0"].capacity / 10)]
+         : battery-icons[floor(EWW_BATTERY["BAT0"].capacity / 10)]} ${EWW_BATTERY["BAT0"].capacity}%`))
 
 (defwindow bar
     :monitor 0
@@ -18,50 +92,21 @@
   (centerbox
    :orientation "horizontal"
    
-   (module
+   (box
     :halign "start"
     (workspaces))
    
-   (module
+   (box
     (time))
    
-   (module
+   (box
     :halign "end"
-    (tray))
+    (systray :halign "end")
+    (box
+     (cpu)
+     (ram)
+     (volume)
+     (brightness)
+     (battery)))
+    
  ))
-
-(defwidget module [?halign]
-  (box
-   :halign halign
-   :orientation "horizontal"
-   (children)))
-
-(defvar workspace-object-array `[
-   {"symbol": "", "number": 1},
-   {"symbol": "", "number": 2},
-   {"symbol": "", "number": 3},
-   {"symbol": "󰈹", "number": 4},
-   {"symbol": "", "number": 5},
-   {"symbol": "", "number": 6}
-]`)
-
-(defwidget workspaces []
-  (box
-   :orientation "horizontal"
-   :halign "start"
-   (for workspace in workspace-object-array
-        (button
-         :onclick `swaymsg workspace ${workspace.number}`
-         `${workspace.symbol}`))))
-
-(defwidget time []
-  (box
-   :tooltip "${cal}"
-   (label :text "${time}")))
-
-(defwidget tray []
-  (box
-   :orientation "horizontal"
-   :halign "start"
-   (systray :spacing 10
-            :orientation "horizontal")))

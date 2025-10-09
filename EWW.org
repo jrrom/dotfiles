@@ -2,17 +2,147 @@
 #+PROPERTY: header-args:yuck :tangle ./stow-home/.config/eww/eww.yuck
 
 * Scripts
-** Current Workspace
+** Volume
+#+begin_src clojure :tangle ./scripts/volume.clj
+#!/usr/bin/env bb
 
+(require '[babashka.process :refer [shell]]
+         '[babashka.cli     :as cli])
+
+(def cli-spec
+  {:spec
+   {:scroll {:desc "Either 'up' or 'down', given by EWW"
+             :alias :s
+             :require true}
+    :value {:coerce :double
+            :validate #(and (>= % 0.0) (<= % 1.0))
+            :desc "Amount of difference"
+            :alias :v
+            :require true}}})
+
+(defn diff [{:keys [scroll value]}]
+  (if (= scroll "down") (- value) value))
+
+(defn get-vol []
+  (->>(shell {:out :string :err :string} "wpctl get-volume @DEFAULT_AUDIO_SINK@")
+      :out
+      (re-find #"[0-9].[0-9]*")
+      Double/parseDouble))
+
+(defn clamp [opts]
+  (let [new-vol (+ (get-vol) (diff opts))]
+    (cond
+      (> new-vol 1.0) 1.0
+      (< new-vol 0.0) 0.0
+      :else new-vol)))
+
+(defn -main [args]
+  (let [opts (cli/parse-opts args cli-spec)]
+    (let [new-vol (clamp opts)]
+      (shell (str "wpctl set-volume @DEFAULT_AUDIO_SINK@ " new-vol))
+      (shell (str "eww update volume=" new-vol)))))
+
+(-main *command-line-args*)
+#+end_src
 * Pollers
 #+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
-(defpoll time :interval "1s"  "date '+%a  %b %d  %H:%M:%S'")
-(defpoll cal  :interval "1h"  "cal | sed '1d;$d'")
+(defpoll time       :interval "1s"  "date '+%a  %b %d  %H:%M:%S'")
+(defpoll volume     :interval "5s"  "wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -oE '[0-9]+\.[0-9]+'")
+(defpoll brightness :interval "10s" "brightnessctl get")
+#+end_src
+* Calendar
+** Window
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwindow cal
+    :monitor 0
+    :geometry
+    (geometry :x "0%"
+              :y "5px"
+              :width "14%"
+              :height "15%"
+              :anchor "top center")
+    :stacking "fg"
+    :exclusive false
+    :focusable false
+    :namespace "bar"
+    (eventbox
+     :cursor "pointer"
+     (calendar)))
+#+end_src
+** Time
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwidget time []
+  (eventbox
+   :onclick "eww open --toggle cal"
+   :cursor "help"
+   :tooltip "Time"
+   (label :text "${time}")))
+#+end_src
+* Widgets
+** Workspaces
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defvar workspace-object-array `[
+   {"symbol": "", "number": 1},
+   {"symbol": "", "number": 2},
+   {"symbol": "", "number": 3},
+   {"symbol": "󰈹", "number": 4},
+   {"symbol": "", "number": 5},
+   {"symbol": "", "number": 6}
+]`)
+
+(defwidget workspaces []
+  (box
+   :orientation "horizontal"
+   (for workspace in workspace-object-array
+        (button
+         :onclick `swaymsg workspace ${workspace.number}`
+         `${workspace.symbol}`))))
+#+end_src
+** CPU
+#+begin_src yuck :toggle ./stow-home/.config/eww/eww.yuck
+(defwidget cpu []
+  (label :text " ${floor(EWW_CPU.avg)}%"))
+#+end_src
+** RAM
+#+begin_src yuck :toggle ./stow-home/.config/eww/eww.yuck
+(defwidget ram []
+  (label :text " ${floor(EWW_RAM.used_mem_perc)}%"))
+#+end_src
+** Volume
+#+begin_src yuck :toggle ./stow-home/.config/eww/eww.yuck
+(defvar volume-icons `["", "", "", "", ""]`)
+
+(defwidget volume []
+  (eventbox
+   :cursor "pointer"
+   :onclick `swaymsg '[title="Volume Control"] move container to workspace current' || pavucontrol &`
+   :onscroll `~/dotfiles/scripts/volume.clj -s {} -v 0.03`
+   (label :text "${volume-icons[floor(volume * 100 / 25)]} ${floor(volume * 100)}%")))
+#+end_src
+** Brightness
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defvar brightness-icons `["󱩎", "󱩏", "󱩐", "󱩑", "󱩒", "󱩓", "󱩔", "󱩕", "󱩖", "󰛨", "󰛨"]`)
+
+(defwidget brightness []
+  (eventbox
+   :onscroll `brightnessctl s $([[ "{}" == up ]] && echo +2% || echo 2%-) && eww update brightness="$(brightnessctl g)"`
+   (label :text `${brightness-icons[floor(brightness * 10 / 255)]} ${floor(brightness * 100 / 255)}%`)))
+#+end_src
+** Battery
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defvar battery-charging-icons `["󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"]`)
+(defvar battery-icons          `["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂"]`)
+
+(defwidget battery []
+   (label
+    :tooltip `${EWW_BATTERY["BAT0"].status}`
+    :text
+    `${EWW_BATTERY["BAT0"].status == "Charging"
+         ? battery-charging-icons[floor(EWW_BATTERY["BAT0"].capacity / 10)]
+         : battery-icons[floor(EWW_BATTERY["BAT0"].capacity / 10)]} ${EWW_BATTERY["BAT0"].capacity}%`))
 #+end_src
 * Bar
 ** Window
-Height is defined in CSS.
-
 #+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
 (defwindow bar
     :monitor 0
@@ -33,62 +163,29 @@ Height is defined in CSS.
   (centerbox
    :orientation "horizontal"
    
-   (module
+   (box
     :halign "start"
     (workspaces))
    
-   (module
+   (box
     (time))
    
-   (module
+   (box
     :halign "end"
-    (tray))
+    (systray :halign "end")
+    (box
+     (cpu)
+     (ram)
+     (volume)
+     (brightness)
+     (battery)))
+    
  ))
 #+end_src
-** Module
-#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
-(defwidget module [?halign]
-  (box
-   :halign halign
-   :orientation "horizontal"
-   (children)))
-#+end_src
-** Wacky Widgets
-*** Workspaces
-#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
-(defvar workspace-object-array `[
-   {"symbol": "", "number": 1},
-   {"symbol": "", "number": 2},
-   {"symbol": "", "number": 3},
-   {"symbol": "󰈹", "number": 4},
-   {"symbol": "", "number": 5},
-   {"symbol": "", "number": 6}
-]`)
 
-(defwidget workspaces []
-  (box
-   :orientation "horizontal"
-   :halign "start"
-   (for workspace in workspace-object-array
-        (button
-         :onclick `swaymsg workspace ${workspace.number}`
-         `${workspace.symbol}`))))
-#+end_src
 
-*** Time
-#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
-(defwidget time []
-  (box
-   :tooltip "${cal}"
-   (label :text "${time}")))
-#+end_src
-*** System Tray
-#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
-(defwidget tray []
-  (box
-   :orientation "horizontal"
-   :halign "start"
-   (systray :spacing 10
-            :orientation "horizontal")))
-#+end_src
+* Styles
+** Main
 
+#+begin_src scss :tangle ./stow-home/.config/eww/eww.scss
+#+end_src

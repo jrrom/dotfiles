@@ -59,6 +59,34 @@ fi
 #+begin_src fish :tangle ./stow-home/.config/fish/config.fish
 set fish_greeting
 #+end_src
+* Systemd
+** Battery Shutdown
+*** Service File
+#+begin_src conf :tangle ./stow-home/.config/systemd/user/battery-shutdown.service
+[Unit]
+Description=Battery Monitor
+
+[Service]
+Type=simple
+ExecStart=%h/.config/systemd/user/battery-monitor.sh
+Restart=always
+
+[Install]
+WantedBy=default.target
+#+end_src
+*** Script
+#+begin_src conf :tangle ./stow-home/.config/systemd/user/battery-monitor.sh
+#!/bin/bash
+while true; do
+    battery_level=$(cat /sys/class/power_supply/BAT0/capacity)
+    battery_status=$(cat /sys/class/power_supply/BAT0/status)
+    
+    if [ "$battery_level" -le 10 ] && [ "$battery_status" = "Discharging" ]; then
+        systemctl poweroff
+    fi
+    sleep 60
+done
+#+end_src
 * Small Programs
 Note: Fish is not added yet because I have to deal with some confusion.
 ** Mako

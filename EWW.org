@@ -2,53 +2,76 @@
 #+PROPERTY: header-args:yuck :tangle ./stow-home/.config/eww/eww.yuck
 
 * Scripts
-** Volume
-#+begin_src clojure :tangle ./scripts/volume.clj
+** Launcher
+*** Applications
+#+begin_src clojure :tangle ./scripts/launcher.clj
 #!/usr/bin/env bb
 
-(require '[babashka.process :refer [shell]]
-         '[babashka.cli     :as cli])
+(require '[babashka.process   :refer [shell]]
+         '[babashka.cli       :as cli]
+         '[cheshire.core      :as json]
+         '[org.httpkit.client :as client]
+         '[org.httpkit.server :as server])
 
-(def cli-spec
-  {:spec
-   {:scroll {:desc "Either 'up' or 'down', given by EWW"
-             :alias :s
-             :require true}
-    :value {:coerce :double
-            :validate #(and (>= % 0.0) (<= % 1.0))
-            :desc "Amount of difference"
-            :alias :v
-            :require true}}})
+;; launcher.clj
+;; launcher.clj "term"
 
-(defn diff [{:keys [scroll value]}]
-  (if (= scroll "down") (- value) value))
+(def port 8090)
 
-(defn get-vol []
-  (->>(shell {:out :string :err :string} "wpctl get-volume @DEFAULT_AUDIO_SINK@")
-      :out
-      (re-find #"[0-9].[0-9]*")
-      Double/parseDouble))
+(defn entry [name command logo]
+  {:name name :command command :logo logo})
 
-(defn clamp [opts]
-  (let [new-vol (+ (get-vol) (diff opts))]
-    (cond
-      (> new-vol 1.0) 1.0
-      (< new-vol 0.0) 0.0
-      :else new-vol)))
+(def applications
+  [(entry "Firefox" "firefox-bin" "󰈹")
+   (entry "OBS"     "obs"         "")
+   (entry "Volume"  "pavucontrol" "󰕾")
+   (entry "VLC"     "vlc"         "󰕼")
+   ])
+#+end_src
+*** Server Daemon
+#+begin_src clojure :tangle ./scripts/launcher.clj
+(defonce server (atom nil))
 
+(defn filter-term [term]
+  (filter
+   #(clojure.string/includes?
+     (clojure.string/lower-case(:name %))
+     (clojure.string/lower-case term))
+   applications))
+
+(defn app [req]
+  (let [body (or (some-> req :body slurp) "")  ; Handle nil body
+        filtered (filter-term body)
+        json-response (json/generate-string filtered)]
+    (println json-response)
+    {:status 200
+     :headers {"Content-Type" "application/json"}
+     :body json-response}))
+#+end_src
+*** Client
+#+begin_src clojure :tangle ./scripts/launcher.clj
+(defn req [s]
+  @(client/post (str "http://localhost:" port)
+               {:body s}))
+#+end_src
+*** Main
+#+begin_src clojure :tangle ./scripts/launcher.clj
 (defn -main [args]
-  (let [opts (cli/parse-opts args cli-spec)]
-    (let [new-vol (clamp opts)]
-      (shell (str "wpctl set-volume @DEFAULT_AUDIO_SINK@ " new-vol))
-      (shell (str "eww update volume=" new-vol)))))
+  (if (nil? args)
+    (reset! server (server/run-server #'app {:port port}))
+    (req (first args))))
 
 (-main *command-line-args*)
 #+end_src
 * Pollers
 #+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
-(defpoll time       :interval "1s"  "date '+%a  %b %d  %H:%M:%S'")
-(defpoll volume     :interval "5s"  "wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -oE '[0-9]+\.[0-9]+'")
-(defpoll brightness :interval "10s" "brightnessctl get")
+(defpoll time         :interval "1s"  "date '+%a  %b %d  %H:%M:%S'")
+(defpoll volume       :interval "1s"  "wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2}'")
+(defpoll brightness   :interval "10s" "brightnessctl get")
+(deflisten active-workspace
+  `swaymsg -m -t subscribe '["workspace"]' | jq -r --unbuffered 'select(.change=="focus") | .current.num'`)
+(deflisten applications
+    `~/dotfiles/scripts/launcher.clj`)
 #+end_src
 * Calendar
 ** Window
@@ -95,6 +118,7 @@
    :orientation "horizontal"
    (for workspace in workspace-object-array
         (button
+         :class "${workspace.number == active-workspace ? 'active' : ''}"
          :onclick `swaymsg workspace ${workspace.number}`
          `${workspace.symbol}`))))
 #+end_src
@@ -109,6 +133,7 @@
   (label :text " ${floor(EWW_RAM.used_mem_perc)}%"))
 #+end_src
 ** Volume
+We can use -l or --limit with set-volume to set the m
 #+begin_src yuck :toggle ./stow-home/.config/eww/eww.yuck
 (defvar volume-icons `["", "", "", "", ""]`)
 
@@ -116,7 +141,11 @@
   (eventbox
    :cursor "pointer"
    :onclick `swaymsg '[title="Volume Control"] move container to workspace current' || pavucontrol &`
-   :onscroll `~/dotfiles/scripts/volume.clj -s {} -v 0.03`
+
+   :onscroll `
+       wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ $([[ "{}" == up ]] && echo 2%+ || echo 2%-) \
+       && eww update volume="$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2}')"
+   `
    (label :text "${volume-icons[floor(volume * 100 / 25)]} ${floor(volume * 100)}%")))
 #+end_src
 ** Brightness
@@ -125,7 +154,10 @@
 
 (defwidget brightness []
   (eventbox
-   :onscroll `brightnessctl s $([[ "{}" == up ]] && echo +2% || echo 2%-) && eww update brightness="$(brightnessctl g)"`
+   :onscroll `
+       brightnessctl s $([[ "{}" == up ]] && echo +2% || echo 2%-) \
+       && eww update brightness="$(brightnessctl g)"
+   `
    (label :text `${brightness-icons[floor(brightness * 10 / 255)]} ${floor(brightness * 100 / 255)}%`)))
 #+end_src
 ** Battery
@@ -178,14 +210,59 @@
      (ram)
      (volume)
      (brightness)
-     (battery)))
-    
- ))
+     (battery)))))
 #+end_src
+* Launcher
+** Window
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defvar current 0)
 
-
+(defwindow launcher
+    :monitor 0
+    :geometry
+    (geometry :y "5px"
+              :height "140px"
+              :anchor "top center")
+    :stacking "fg"
+    :exclusive false
+    :focusable true
+    :vexpand false
+    :namespace "launcher"
+    (box
+     :orientation "vertical"
+     :spacing 0
+     :space-evenly false
+     :vexpand false
+     (input
+      :valign "start"
+      :onchange `~/dotfiles/scripts/launcher.clj "{}"`
+      :onaccept `(${applications[current].command} &) && eww open --toggle launcher`)
+     (scroll
+      :vexpand true
+      (entries))))
+#+end_src
+** Entries
+#+begin_src yuck :tangle ./stow-home/.config/eww/eww.yuck
+(defwidget entries []
+  (box
+   :orientation "vertical"
+   :valign "start"
+   :vexpand false
+   (for application in applications
+        (eventbox
+         :cursor "pointer"
+         :orientation "horizontal"
+         :onclick `(${application.command} &) && eww open --toggle launcher`
+         (box
+          (label :halign "center" :text "${application.logo}")
+          (label :halign "start" :text "${application.name}"))))))
+#+end_src
 * Styles
 ** Main
-
+Org mode adds commas before * to prevent interpreting it as a header. The commas are removed afterwards so don't pay it any heed.
 #+begin_src scss :tangle ./stow-home/.config/eww/eww.scss
+,* {
+    // Whatever
+}  
+
 #+end_src

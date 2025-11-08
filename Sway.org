@@ -16,7 +16,6 @@ set $up k
 set $right l
 
 set $main emacs
-set $menu wmenu-run
 #+end_src
 * Wallpaper
 #+begin_src conf
@@ -28,7 +27,6 @@ exec eww daemon
 #+end_src
 * Keybindings
 Note: I do not use the Sway scratchpad.
-
 ** Basics
 #+begin_src conf
 # Start main program
@@ -38,7 +36,10 @@ bindsym $mod+Return exec $main
 bindsym $mod+Shift+q kill
 
 # Start your launcher
-bindsym $mod+d exec $menu
+bindsym $mod+d exec eww open launcher --toggle
+
+# Increment launcher
+# bindsym $mod+Ctrl+n exec ~/dotfiles/scripts/next.clj
 
 # Drag floating windows by holding down $mod and left mouse button.
 # Resize them with right mouse button + $mod.
@@ -201,7 +202,6 @@ for_window [window_type="dialog"] floating enable
 for_window [window_role="dialog"] floating enable
 for_window [app_id="flameshot"] floating enable
 for_window [app_id="nm-connection-editor"] floating enable
-for_window [class="st-256color"] floating enable
 for_window [app_id="org.pulseaudio.pavucontrol"] floating enable
 #+end_src
 ** Keyboard

@@ -24,6 +24,78 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
+(use-package emacs
+  :custom
+  ;; Files
+  (auto-save-default nil)                   ;; Disable auto save and lockfile creation
+  (create-lockfiles nil)
+  (make-backup-files nil)                   ;; Disable creation of backup files
+  (global-auto-revert-non-file-buffers t)   ;; In conjunction with (global-auto-revert-mode 1) allows to keep up-to-date
+  (history-length 200)                      ;; Set the length of the command history.
+  (recentf-max-saved-items 100)             ;; number of files to remember with recentf
+
+  ;; Startup
+  (inhibit-startup-message t)               ;; Disable the startup message when Emacs launches
+  (initial-scratch-message "")              ;; Clear the initial message in the *scratch* buffer
+
+  ;; Misc
+  (use-short-answers t)                     ;; Use short answers in prompts for quicker responses (y instead of yes)
+  (warning-minimum-level :emergency)        ;; Only emergencies here
+  (debug-on-error t)
+
+  ;; Window and movement
+  (pixel-scroll-precision-use-momentum nil) ;; Disable momentum scrolling for pixel precision.
+  (split-width-threshold 300)               ;; Prevent automatic window splitting if the window width exceeds 300 pixels
+
+  ;; Editing
+  (ispell-dictionary nil)                   ;; Set the default dictionary for spell checking
+  (text-mode-ispell-word-completion nil)
+  (display-line-numbers-type 'relative)     ;; Relative line numbers
+  (ring-bell-function 'ignore)              ;; Disable the audible bell and visible bell
+  (tab-always-indent 'complete)             ;; Make the TAB key complete text instead of just indenting.
+  (tab-width 4)                             ;; Set the tab width to 4 spaces.
+
+  ;; Vertico
+  (enable-recursive-minibuffers t)
+  ;; Hide commands in M-x which do not work in the current mode.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  ;; Do not allow the cursor in the minibuffer prompt
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt))
+)
+
+(use-package emacs
+  :init
+  ;; Files
+  (auto-revert-mode 1)                      ;; Keeps your Emacs buffers in sync with external changes
+  (recentf-mode 1)                          ;; Keep track of recent files!
+
+  ;; Window and Movement
+  (pixel-scroll-precision-mode t)           ;; Enable precise pixel scrolling.
+
+  ;; Appearance
+  (menu-bar-mode -1)                        ;; Remove menubar
+  (tool-bar-mode -1)                        ;; Remove toolbar
+  (scroll-bar-mode -1)                      ;; Remove scrollbar
+  (global-visual-line-mode 0)               ;; Visual line mode wrapping
+
+  ;; Editing
+  (indent-tabs-mode nil)
+  (electric-pair-mode 1)
+
+  ;; Vertico
+  (context-menu-mode t) ;; Enable context menu for `vertico-multiform-mode'
+  :hook (prog-mode . display-line-numbers-mode)
+  :config
+  (setq-default indent-tabs-mode nil)       ;; Disable the use of tabs for indentation (use spaces instead).
+  (prefer-coding-system 'utf-8)             ;; Only UTF8 here
+  (setq-default cursor-type 'box))
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (with-current-buffer "*scratch*"
+              (display-line-numbers-mode -1))))
+
 (when (member "Maple Mono" (font-family-list))
   (set-face-attribute 'default nil :font "Maple Mono-15")
   (set-face-attribute 'fixed-pitch nil :family "Maple Mono"))
@@ -37,8 +109,8 @@
 ;; Mixed pitch mode
 (use-package mixed-pitch
   :ensure t
-  :hook ((text-mode . mixed-pitch-mode)
-  	 (help-mode . mixed-pitch-mode))
+  :hook
+  (org-mode . mixed-pitch-mode)
   :custom
   (mixed-pitch-variable-pitch-cursor 'box))
 
@@ -51,111 +123,58 @@
   :ensure t
   :config
   (ligature-set-ligatures
-   '(prog-mode org-mode)
-   '("::" "?." "<#--" ":::" "..<" "<!---->" "?:"
-     ".=" "<->" ":?" "<~" "<-->" ":?>" "~>"
-     "->" "<:" "~~" "<-" ":>" "<~>" "-->"
-     ":<" "<~~" "<--" "<:<" "~~>" ">->"
-     ">:>" "-~" "<-<" "__" "~-"
-     "|->" "#{" "~@" "<-|"
-     "#[" "~~~~~~~" "-------" "#("
-     "0xA12" "0x56" "1920x1080"
-     ">--" "#?" "<>" "--<" "#!"
-     "</" "<|||" "#:" "/>" "|||>"
-     "#=" "</>" "<||" "#_"
-     "<+" "||>" "#__" "+>"
-     "<|" "#_(" "<+>" "|>" "]#"
-     "<*>" "<*>" "<<<" ">=" "[DEBUG]"
-     ">>" "<=" "[INFO]" ">>>"
-     "<=<" "[WARN]" "{{" ">=>"
-     "[ERROR]" "}}" "==" "[FATAL]"
-     "{|" "===" "[TODO]" "|}"
-     "!=" "[FIXME]" "{--" "!=="
-     "[NOTE]" "{{!--" "=/=" "[HACK]"
-     "--}}" "=!=" "[MARK]" "[|"
-     "|=" "[EROR]" "|]" "<=>"
-     "[WARNING]" "!!" "<==>" "todo))"
-     "||" "<==" "fixme))" "??"
-     "==>" "Cl" "???" "=>"
-     "al" "&&" "<=|" "cl"
-     "&&&" "|=>" "el" "//"
-     "=<=" "il" "///" "=>="
-     "tl" "/*" "=======" "ul"
-     "/**" ">=<" "xl" "*/"
-     ":=" "ff" "++" "=:"
-     "tt" "+++" ":=:" "all"
-     ";;" "=:=" "ell" ";;;"
-     "\\\\" "\\'" "\\." "ill"
-     ".." "--" "ull" "..."
-     "---" "ll" ".?" "<!--"))
+   '(prog-mode org-mode markdown-mode)
+   '("::"    "?."    "<#--"      ":::"       "..<"    "<!---->"   "?:"       "#_"
+     ".="    "<->"   ":?"        "<~"        "<-->"   ":?>"       "~>"       "<||"
+     "->"    "<:"    "~~"        "<-"        ":>"     "<~>"       "-->"      "</>"
+     ":<"    "<~~"   "<--"       "<:<"       "~~>"    ">->"       ">:>"      "#="
+     "-~"    "<-<"   "__"        "~-"        "|->"    "#{"        "~@"       "+>"
+     "<-|"   "#["    "~~~~~~~"   "-------"   "#("     ">--"       "#?"       "#__"
+     "<>"    "--<"   "#!"        "</"        "<|||"   "#:"        "/>"       "|||>"
+     "<+"    "||>"   "<|"        "#_("       "<+>"    "|>"        "]#"       ">=>"
+     "<*>"   "<*>"   "<<<"       ">="        ">>"     "<="        ">>>"      "<=<"
+     "=="    "{|"    "==="       "|}"        "!="     "{--"       "!=="      "{{!--"
+     "=/="   "--}}"  "=!="       "[|"        "|="     "|]"        "<=>"      "!!"
+     "<==>"  "||"    "<=="       "??"        "==>"    "Cl"        "???"      "=>"
+     "al"    "&&"    "<=|"       "cl"        "&&&"    "|=>"       "el"       "//"
+     "=<="   "il"    "///"       "=>="       "tl"     "/*"        "======="  "ul"
+     "/**"   ">=<"   "xl"        "*/"        ":="     "ff"        "++"       "=:"
+     "tt"    "+++"   ":=:"       "all"       ";;"     "=:="       "ell"      ";;;"
+     "\\\\"  "\\'"   "\\."       "ill"       ".."     "--"        "ull"      "..."
+     "---"   "ll"    ".?"        "<!--"
+     ;; Not using : "}}" "{{", or any text ligatures - "TODO", etc
+     ))
   (global-ligature-mode t))
-
-(use-package emacs
-  :custom
-  ;; Buffer-related
-  (auto-save-default nil)                   ;; Disable auto save and lockfile creation
-  (create-lockfiles nil)                   
-  (make-backup-files nil)                   ;; Disable creation of backup files
-  (inhibit-startup-message t)               ;; Disable the startup message when Emacs launches
-  (initial-scratch-message "")              ;; Clear the initial message in the *scratch* buffer
-  (use-short-answers t)                     ;; Use short answers in prompts for quicker responses (y instead of yes)
-  (global-auto-revert-non-file-buffers t)   ;; In conjunction with (global-auto-revert-mode 1) allows to keep up-to-date
-  (recentf-max-saved-items 100)             ;; number of files to remember with recentf
-  (visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
-  (global-visual-line-mode 1)               ;; Visual line mode wrapping
-
-  ;; Vertico support
-  ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
-  ;; to switch display modes.
-  (context-menu-mode t)
-  (enable-recursive-minibuffers t)
-  ;; Hide commands in M-x which do not work in the current mode.  Vertico
-  ;; commands are hidden in normal buffers. This setting is useful beyond
-  ;; Vertico.
-  (read-extended-command-predicate #'command-completion-default-include-p)
-  ;; Do not allow the cursor in the minibuffer prompt
-  (minibuffer-prompt-properties
-   '(read-only t cursor-intangible t face minibuffer-prompt))
-  
-  
-  ;; Window and movement
-  (pixel-scroll-precision-mode t)           ;; Enable precise pixel scrolling.
-  (pixel-scroll-precision-use-momentum nil) ;; Disable momentum scrolling for pixel precision.
-  (split-width-threshold 300)               ;; Prevent automatic window splitting if the window width exceeds 300 pixels
-
-  ;; Editing
-  (electric-pair-mode 1)
-  (display-line-numbers-type 'relative)     ;; Relative line numbers
-  (ispell-dictionary nil)                   ;; Set the default dictionary for spell checking
-  (ring-bell-function 'ignore)              ;; Disable the audible bell and visible bell
-  (tab-always-indent 'complete)             ;; Make the TAB key complete text instead of just indenting.
-  (tab-width 4)                             ;; Set the tab width to 4 spaces.
-
-  ;; Misc
-  (history-length 200)                      ;; Set the length of the command history.
-  (warning-minimum-level :emergency)        ;; Only emergencies here
-  (debug-on-error t)
-  :init
-  (menu-bar-mode -1)                        ;; Remove menubar
-  (tool-bar-mode -1)                        ;; Remove toolbar
-  (scroll-bar-mode -1)                      ;; Remove scrollbar
-  :hook (prog-mode . display-line-numbers-mode)
-  :config
-  (savehist-mode 1)                         ;; Save history
-  (recentf-mode 1)                          ;; Keep track of recent files!
-  (auto-revert-mode 1)                      ;; Keeps your Emacs buffers in sync with external changes
-  (setq-default indent-tabs-mode nil)       ;; Disable the use of tabs for indentation (use spaces instead).
-  (prefer-coding-system 'utf-8)             ;; Only UTF8 here
-  (setq-default cursor-type 'box))
-
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (with-current-buffer "*scratch*"
-              (display-line-numbers-mode -1))))
 
 (use-package gruvbox-theme
   :ensure t
   :config (load-theme 'gruvbox-dark-medium t nil))
+
+(use-package visual-fill-column
+  :ensure t
+  :custom
+  (visual-fill-column-width 80)       ;; max width
+  (visual-fill-column-center-text t)) ;; center text
+
+(use-package text-mode
+  :custom
+  (visual-line-fringe-indicators '(nil right-triangle))
+  :hook
+  (text-mode . visual-line-mode))
+
+(use-package prog-mode
+  :custom
+  (visual-line-fringe-indicators '(nil right-triangle)))
+
+(use-package indent-bars
+  :ensure t
+  :config
+  (setq
+   indent-bars-pattern "."
+   indent-bars-width-frac 0.1
+   indent-bars-pad-frac 0.1
+   indent-bars-highlight-current-depth '(:face default :blend 0.4))
+  :hook ((nix-mode) . indent-bars-mode))
 
 (defun jrrom/org-face-sizes ()
   (dolist (face '((org-level-1 . 1.1)
@@ -172,6 +191,11 @@
 (use-package org
   :defer t
   :hook (org-mode . (lambda ()
+                      (visual-line-mode 1)
+                      (modify-syntax-entry ?< "." org-mode-syntax-table) ;; Please don't match < and )
+                      (modify-syntax-entry ?> "." org-mode-syntax-table)
+                      (setq-local electric-pair-inhibit-predicate
+                                  (lambda (c) (when (char-equal c ?<) t)))
                       (when (org-before-first-heading-p)
                         (org-content 2))))
   :custom
@@ -194,6 +218,20 @@
   :ensure t
   :config ; add late to hook
   (add-hook 'org-mode-hook #'org-modern-indent-mode))
+
+(use-package org-contrib
+  :ensure t
+  :defer t
+  :after org)
+
+(use-package org-babel
+  :no-require
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+	 (emacs-lisp . t)
+	 (shell . t))))
 
 (use-package repeat
   :ensure t
@@ -219,12 +257,19 @@
   :bind
   ("M-j" . avy-goto-char-timer))
 
-(use-package completion-preview
-  :hook (prog-mode . completion-preview-mode)
-  :bind
-  (:map completion-preview-active-mode-map
-        ("M-n" . completion-preview-next-candidate)
-        ("M-p" . completion-preview-prev-candidate)))
+;; For conf-mode (ini/conf files)
+(use-package conf-mode
+  :ensure nil   ;; it's built-in
+  :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
+
+(use-package ebuild-mode
+  :ensure nil
+  :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
+
+;; For Makefiles (needs tabs)
+(use-package make-mode
+  :ensure nil
+  :hook (makefile-mode . (lambda () (setq indent-tabs-mode t))))
 
 (use-package vertico
   :ensure t
@@ -297,6 +342,7 @@
          ;; Other custom bindings
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
+         
          ("M-g e" . consult-compile-error)
          ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
@@ -311,15 +357,10 @@
          ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
          ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
          ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-         ;; Minibuffer history
+         ("M-s L" . consult-line-multi)
          :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
-
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
+         ("M-s" . consult-history)
+         ("M-r" . consult-history))            ;; needed by consult-line to detect isearch
 
   ;; The :init configuration is always executed (Not lazy)
   :init
@@ -367,56 +408,109 @@
   :ensure t
   :custom
   (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  (completion-category-overrides
+   '((file (styles basic partial-completion))))
+  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+
+(use-package corfu
+  :ensure t
+  :custom
+  (corfu-cycle t)
+  :init
+  (global-corfu-mode)
+  )
 
 (use-package treesit-auto
   :ensure t
   :custom
-  (treesit-auto-install 'prompt)
+  (treesit-auto-install t)
   :config
-  (treesit-auto-add-to-auto-mode-alist 'all))
-;;  (global-treesit-auto-mode))
+  (treesit-auto-add-to-auto-mode-alist '(bash c nix))
+  (global-treesit-auto-mode))
 
-(use-package org-contrib
+(use-package eglot
+  :ensure nil
+  :custom
+  (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
+  :bind (:map eglot-mode-map
+              ;; L in namespace stands for LSP
+	          ("C-c l a" . eglot-code-actions)
+	          ("C-c l r" . eglot-rename)
+	          ("C-c l h" . eldoc)
+	          ("C-c l f" . eglot-format)
+	          ("C-c l F" . eglot-format-buffer)
+	          ("C-c l d" . xref-find-definitions-at-mouse)
+	          ;; sometimes 
+	          ("C-c l R" . eglot-reconnect)))
+
+(use-package nix-mode
   :ensure t
-  :defer t
-  :after org)
+  :mode "\\.nix\\'")
 
-(use-package org-babel
-  :no-require
+(use-package envrc
+  :ensure t
+  :hook (after-init . envrc-global-mode))
+
+(add-to-list 'load-path "/nix/var/nix/profiles/default/bin")
+(add-to-list 'load-path (expand-file-name "~/.nix-profile/bin"))
+
+(use-package c-ts-mode
+  :hook
+  (c-ts-mode . (lambda ()
+                 (c-ts-mode-set-style 'k&r)
+                 (setq c-ts-mode-indent-offset 4))))
+
+(use-package ess
+  :ensure t
+  :custom
+  (ess-style 'RStudio)
+  (ess-indent-offset 2))
+
+(use-package polymode
+  :hook
+  (polymode-init-host  . visual-fill-column-mode)
+  (polymode-init-inner . visual-fill-column-mode)
+  :hook
+  (polymode-init-host  . (lambda () (setq-local font-lock-maximum-decoration 1)))
+  (polymode-init-inner . (lambda () (setq-local font-lock-maximum-decoration 1)))
+  :ensure t)
+
+(use-package poly-R
+  :ensure t)
+
+(use-package poly-markdown
+  :ensure t)
+
+;; For editing markdown code blocks!
+(use-package edit-indirect
+  :ensure t)
+
+(use-package markdown-mode
+  :ensure t
+  :hook
+  (markdown-mode . visual-fill-column-mode)
   :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-	 (emacs-lisp . t)
-	 (shell . t))))
+  (setq markdown-fontify-code-blocks-natively t
+        markdown-code-lang-modes
+        '(("r" . ess-r-mode)
+          (" {r" . ess-r-mode)
+          ("{r"  . ess-r-mode) 
+          ("python" . python-mode)
+          ("bash" . shell-script-mode))))
 
 (use-package fish-mode
   :ensure t)
-
-(use-package clojure-mode
-  :ensure t)
-
-(use-package ebuild-mode) ;; ensure nil
 
 (use-package yuck-mode
   :ensure t
   :hook
   (yuck-mode . (lambda () (setq-local lisp-indent-function #'common-lisp-indent-function))))
 
-;; For conf-mode (ini/conf files)
-(use-package conf-mode
-  :ensure nil   ;; it's built-in
-  :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
+(use-package clojure-mode
+  :ensure t)
 
 (use-package ebuild-mode
-  :ensure nil
-  :hook (conf-mode . (lambda () (setq indent-tabs-mode t))))
-
-;; For Makefiles (needs tabs)
-(use-package make-mode
-  :ensure nil
-  :hook (makefile-mode . (lambda () (setq indent-tabs-mode t))))
+  :ensure nil) ;; ensure nil
 
 (use-package dired
   :custom
@@ -431,21 +525,7 @@
   :config
   ;; this command is useful when you want to close the window of `dirvish-side'
   ;; automatically when opening a file
-  (put 'dired-find-alternate-file 'disabled nil)
-  (setq dired-guess-shell-alist-user
-      '(("\\.mp4\\'" "mpv %s &")
-        ("\\.mkv\\'" "mpv %s &")
-        ("\\.webm\\'" "mpv %s &")
-        ("\\.avi\\'" "mpv %s &")
-        ("\\.mov\\'" "mpv %s &")
-        ("\\.flv\\'" "mpv %s &")
-        ("\\.mpg\\'" "mpv %s &")
-        ("\\.pdf\\'" "firefox %s &")
-        ("\\.mp3\\'" "mpv %s &")
-        ("\\.flac\\'" "mpv %s &")
-        ("\\.ogg\\'" "mpv %s &")
-        ("\\.wav\\'" "mpv %s &")
-        ("\\.m4a\\'" "mpv %s &")))) ;; There can only be one buffer!
+  (put 'dired-find-alternate-file 'disabled nil))
 
 (use-package dired-open-with
   :ensure t)
@@ -460,7 +540,7 @@
      ("d" "~/Downloads/"                "Downloads")
 	 ("p" "~/Projects/"                 "Projects")))
   :config
-  (dirvish-peek-mode)              ; Preview files in minibuffer
+  (dirvish-peek-mode 0)              ; Preview files in minibuffer
   (dirvish-side-follow-mode)       ; similar to `treemacs-follow-mode'
   ;; Order matters in attributes
   (setq dirvish-attributes '(vc-state subtree-state nerd-icons collapse git-msg file-time file-size file-modes)

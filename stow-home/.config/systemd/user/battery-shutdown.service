@@ -1,0 +1,10 @@
+[Unit]
+Description=Battery Monitor
+
+[Service]
+Type=simple
+ExecStart=%h/.config/systemd/user/battery-monitor.sh
+Restart=always
+
+[Install]
+WantedBy=default.target
